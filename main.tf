@@ -52,10 +52,10 @@ resource "aws_iam_policy" "policy" {
 EOT
 }
 
-resource "aws_s3_bucket_policy" "policy" {
+resource "aws_s3_bucket_policy" "mypolicy" {
   bucket = data.aws_s3_bucket.remote-state.id
 
-  policy = <<POLICY
+  policy = <<POLICY1
 {
     "Version": "2012-10-17",
     "Id": "Policy1653577756734",
@@ -64,19 +64,21 @@ resource "aws_s3_bucket_policy" "policy" {
             "Sid": "Stmt1653577726786",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::914405036144:user/Bob"
+                "AWS": "${aws_iam_user.new_user.arn}"
             },
             "Action": "s3:ListBucket",
-            "Resource": "arn:aws:s3:::tr-state-maxno1988"
+            "Resource": "${data.aws_s3_bucket.remote-state.arn}" 
         },
         {
             "Sid": "Stmt1653577755475",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::914405036144:user/Bob"
+                "AWS": "${aws_iam_user.new_user.arn}"
             },
             "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::tr-state-maxno1988/*"
+            "Resource": "${data.aws_s3_bucket.remote-state.arn}/*"
         }
     ]
+}
+POLICY1
 }
