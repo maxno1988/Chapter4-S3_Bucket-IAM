@@ -11,13 +11,25 @@ provider "aws" {
   region = var.region
 }
 
+
 resource "random_pet" "pet_name" {
   length    = 3
   separator = "-"
 }
 
 resource "aws_iam_user" "new_user" {
-  name = "new_user"
+  name = "Alice"
+}
+
+resource "aws_iam_user_policy_attachment" "Attach-Test" {
+  user       = aws_iam_user.new_user.name
+  policy_arn = aws_iam_policy.policy.arn
+}
+
+resource "aws_iam_group_membership" "Consultants" {
+  name  = "IAMGroup"
+  users = [aws_iam_user.new_user.name]
+  group = "Consultants"
 }
 
 resource "aws_s3_bucket" "bucket" {
@@ -62,4 +74,3 @@ resource "aws_iam_policy" "policy" {
 }
 EOT
 }
-
