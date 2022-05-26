@@ -11,11 +11,10 @@ provider "aws" {
   region = var.region
 }
 
-
-resource "random_pet" "pet_name" {
-  length    = 3
-  separator = "-"
+data "aws_s3_bucket" "remote-state" {
+  bucket = "tr-state-maxno1988"
 }
+
 
 resource "aws_iam_user" "new_user" {
   name = "Alice"
@@ -32,23 +31,9 @@ resource "aws_iam_group_membership" "Consultants" {
   group = "Consultants"
 }
 
-resource "aws_s3_bucket" "bucket" {
-  bucket = "${random_pet.pet_name.id}-bucket"
-
-  tags = {
-    Name        = "My bucket"
-    Environment = "Dev"
-  }
-}
-
-resource "aws_s3_bucket_acl" "bucket" {
-  bucket = aws_s3_bucket.bucket.id
-
-  acl = "private"
-}
 
 resource "aws_iam_policy" "policy" {
-  name        = "${random_pet.pet_name.id}-policy"
+  name        = "NewUser_Test_Policy"
   description = "My test policy"
 
   policy = <<EOT
@@ -64,10 +49,14 @@ resource "aws_iam_policy" "policy" {
     },
     {
       "Action": [
-        "s3:*"
+        "s3:GetObject",
+        "s3:ListBucket"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.bucket.arn}"
+      "Resource": [
+         "${data.aws_s3_bucket.remote-state.arn}",
+         "${data.aws_s3_bucket.remote-state.arn}/*"
+       ]
     }
 
   ]
